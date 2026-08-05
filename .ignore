@@ -1,0 +1,5 @@
+# Un-ignore these files for the agent's search tools (ripgrep)
+!AGENTS.md
+!*.pdf
+!*.numbers
+!*.csv

@@ -1,0 +1,48 @@
+'use server';
+
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import dbConnect from '@/lib/db';
+import { Inscription } from '../inscriptions/schema';
+import { parseInscriptionsCsv } from './import';
+
+export async function importCSVAction(formData: FormData): Promise<{ success: boolean; message?: string; error?: string }> {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+      return { success: false, error: 'Unauthorized' };
+    }
+
+    const file = formData.get('file') as File | null;
+    if (!file) {
+      return { success: false, error: 'No file uploaded' };
+    }
+
+    const csvText = await file.text();
+    const records = await parseInscriptionsCsv(csvText);
+
+    if (records.length === 0) {
+      return { success: false, error: 'No valid records found in CSV' };
+    }
+
+    await dbConnect();
+    
+    const bulkOps = records.map((record) => ({
+      updateOne: {
+        filter: { tmId: record.tmId },
+        update: { $set: record },
+        upsert: true
+      }
+    }));
+
+    const result = await Inscription.bulkWrite(bulkOps);
+
+    return { 
+      success: true, 
+      message: `Successfully imported CSV. Upserted ${result.upsertedCount}, Modified ${result.modifiedCount}.`
+    };
+  } catch (error: any) {
+    console.error('Import error:', error);
+    return { success: false, error: error.message || 'Failed to import CSV' };
+  }
+}
