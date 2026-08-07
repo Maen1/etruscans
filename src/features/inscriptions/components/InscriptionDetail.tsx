@@ -24,15 +24,15 @@ export default function InscriptionDetail({ record }: { record: InscriptionData 
               </Link>
               {record.corpora.map((corpus, i) => (
                 <span key={i}>
-                  <span className="mx-2 text-slate-400">=</span>
-                  <Link href={`/browse/${corpus.name}`} className="hover:underline">
+                  <span className="mx-2 text-muted-foreground/50">=</span>
+                  <Link href={`/browse/${corpus.name}`} className="text-primary hover:underline transition-colors">
                     {corpus.identifier}
                   </Link>
                 </span>
               ))}
             </div>
             {record.metadata.isForgery && (
-              <span className="text-sm font-semibold text-red-600 bg-red-100 px-3 py-1 rounded-full whitespace-nowrap">
+              <span className="text-sm font-semibold text-destructive bg-destructive/10 px-3 py-1 rounded-full whitespace-nowrap border border-destructive/20 shadow-sm">
                 ⚠️ Possible Forgery
               </span>
             )}
@@ -41,29 +41,29 @@ export default function InscriptionDetail({ record }: { record: InscriptionData 
         <CardContent className="space-y-8">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <h3 className="font-semibold text-gray-500">Object Type</h3>
-              <p className="text-lg">{record.metadata.objectType || 'Unknown'}</p>
+              <h3 className="font-semibold text-muted-foreground text-sm uppercase tracking-wider">Object Type</h3>
+              <p className="text-lg font-medium">{record.metadata.objectType || 'Unknown'}</p>
             </div>
             <div>
-              <h3 className="font-semibold text-gray-500">Language</h3>
-              <p className="text-lg">{record.metadata.language || 'Unknown'}</p>
+              <h3 className="font-semibold text-muted-foreground text-sm uppercase tracking-wider">Language</h3>
+              <p className="text-lg font-medium">{record.metadata.language || 'Unknown'}</p>
             </div>
           </div>
 
           {Object.keys(groupedRefs).length > 0 && (
             <div>
-              <h3 className="font-semibold text-gray-500 mb-4 border-b pb-2">Archive References</h3>
+              <h3 className="font-semibold text-muted-foreground text-sm uppercase tracking-wider mb-4 border-b border-border pb-2">Archive References</h3>
               <div className="space-y-4">
                 {Object.entries(groupedRefs).map(([category, refs]) => (
                   <div key={category} className="leading-relaxed">
-                    <span className="font-semibold text-slate-900 mr-2">{category}</span>
+                    <span className="font-semibold text-foreground mr-2">{category}</span>
                     {refs.map((ref: any, i: number) => (
                       <span key={i}>
                         <a 
                           href={ref.uri} 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          className="text-indigo-600 hover:text-indigo-800 hover:underline break-all"
+                          className="text-primary hover:text-secondary hover:underline break-all transition-colors font-medium"
                         >
                           {ref.label}
                         </a>

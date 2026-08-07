@@ -4,7 +4,7 @@ import { z } from 'zod';
 export const ReferenceSchema = z.object({
   category: z.string(),
   label: z.string(),
-  uri: z.string().url()
+  uri: z.union([z.string().url(), z.literal('')]).optional()
 });
 
 export const InscriptionSchema = z.object({

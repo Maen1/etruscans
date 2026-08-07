@@ -4,11 +4,18 @@ import { Inscription } from '../inscriptions/schema';
 import * as auth from 'next-auth';
 
 // Mock Mongoose model
-vi.mock('../inscriptions/schema', () => ({
-  Inscription: {
-    bulkWrite: vi.fn().mockResolvedValue({ upsertedCount: 1, modifiedCount: 1 })
-  }
-}));
+vi.mock('../inscriptions/schema', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../inscriptions/schema')>();
+  return {
+    ...actual,
+    Inscription: {
+      bulkWrite: vi.fn().mockResolvedValue({ upsertedCount: 1, modifiedCount: 1 }),
+      create: vi.fn().mockResolvedValue({ _id: 'mockid' }),
+      findByIdAndUpdate: vi.fn().mockResolvedValue({ _id: 'mockid', tmId: 'TM123' }),
+      findByIdAndDelete: vi.fn().mockResolvedValue({ _id: 'mockid' })
+    }
+  };
+});
 
 // Mock DB connection
 vi.mock('@/lib/db', () => ({

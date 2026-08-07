@@ -47,21 +47,23 @@ export function InscriptionForm({ initialData }: InscriptionFormProps) {
     name: 'references'
   });
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: InscriptionData) => {
     setIsSubmitting(true);
     setError(null);
     try {
-      const result = isEditing && initialData._id
-        ? await updateInscription(initialData._id, data)
-        : await createInscription(data);
-        
-      if (result.success) {
-        router.push('/admin');
+      if (isEditing) {
+        await updateInscription(initialData._id!, data);
       } else {
-        setError(result.error || 'Something went wrong.');
+        await createInscription(data);
       }
-    } catch (err: any) {
-      setError(err.message || 'An unexpected error occurred.');
+      router.push('/admin');
+      router.refresh();
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unexpected error occurred');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -73,7 +75,7 @@ export function InscriptionForm({ initialData }: InscriptionFormProps) {
         <CardTitle>{isEditing ? 'Edit Inscription' : 'New Inscription'}</CardTitle>
       </CardHeader>
       
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit as any)}>
         <CardContent className="space-y-8">
           {error && (
             <div className="bg-destructive/15 text-destructive p-3 rounded-md text-sm font-medium">

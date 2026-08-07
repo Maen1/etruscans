@@ -3,7 +3,7 @@
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import dbConnect from '@/lib/db';
-import { Inscription } from '../inscriptions/schema';
+import { Inscription, InscriptionSchema } from '../inscriptions/schema';
 import { parseInscriptionsCsv } from './import';
 import { revalidatePath } from 'next/cache';
 
@@ -28,13 +28,16 @@ export async function importCSVAction(formData: FormData): Promise<{ success: bo
 
     await dbConnect();
     
-    const bulkOps = records.map((record) => ({
-      updateOne: {
-        filter: { tmId: record.tmId },
-        update: { $set: record },
-        upsert: true
-      }
-    }));
+    const bulkOps = records.map((record) => {
+      const validatedData = InscriptionSchema.parse(record);
+      return {
+        updateOne: {
+          filter: { tmId: validatedData.tmId },
+          update: { $set: validatedData },
+          upsert: true
+        }
+      };
+    });
 
     const result = await Inscription.bulkWrite(bulkOps);
 
@@ -56,7 +59,8 @@ export async function createInscription(data: any): Promise<{ success: boolean; 
     }
     
     await dbConnect();
-    await Inscription.create(data);
+    const validatedData = InscriptionSchema.parse(data);
+    await Inscription.create(validatedData);
     
     revalidatePath('/admin');
     revalidatePath('/');
@@ -75,7 +79,8 @@ export async function updateInscription(id: string, data: any): Promise<{ succes
     }
     
     await dbConnect();
-    const result = await Inscription.findByIdAndUpdate(id, data, { new: true });
+    const validatedData = InscriptionSchema.parse(data);
+    const result = await Inscription.findByIdAndUpdate(id, validatedData, { new: true });
     
     if (!result) {
       return { success: false, error: 'Inscription not found' };
