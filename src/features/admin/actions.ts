@@ -5,6 +5,7 @@ import { authOptions } from '@/lib/auth';
 import dbConnect from '@/lib/db';
 import { Inscription } from '../inscriptions/schema';
 import { parseInscriptionsCsv } from './import';
+import { revalidatePath } from 'next/cache';
 
 export async function importCSVAction(formData: FormData): Promise<{ success: boolean; message?: string; error?: string }> {
   try {
@@ -44,5 +45,66 @@ export async function importCSVAction(formData: FormData): Promise<{ success: bo
   } catch (error: any) {
     console.error('Import error:', error);
     return { success: false, error: error.message || 'Failed to import CSV' };
+  }
+}
+
+export async function createInscription(data: any): Promise<{ success: boolean; error?: string }> {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+      return { success: false, error: 'Unauthorized' };
+    }
+    
+    await dbConnect();
+    await Inscription.create(data);
+    
+    revalidatePath('/admin');
+    revalidatePath('/');
+    return { success: true };
+  } catch (error: any) {
+    console.error('Create error:', error);
+    return { success: false, error: error.message || 'Failed to create inscription' };
+  }
+}
+
+export async function updateInscription(id: string, data: any): Promise<{ success: boolean; error?: string }> {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+      return { success: false, error: 'Unauthorized' };
+    }
+    
+    await dbConnect();
+    const result = await Inscription.findByIdAndUpdate(id, data, { new: true });
+    
+    if (!result) {
+      return { success: false, error: 'Inscription not found' };
+    }
+    
+    revalidatePath('/admin');
+    revalidatePath(`/text/${result.tmId}`);
+    return { success: true };
+  } catch (error: any) {
+    console.error('Update error:', error);
+    return { success: false, error: error.message || 'Failed to update inscription' };
+  }
+}
+
+export async function deleteInscription(id: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+      return { success: false, error: 'Unauthorized' };
+    }
+    
+    await dbConnect();
+    await Inscription.findByIdAndDelete(id);
+    
+    revalidatePath('/admin');
+    revalidatePath('/');
+    return { success: true };
+  } catch (error: any) {
+    console.error('Delete error:', error);
+    return { success: false, error: error.message || 'Failed to delete inscription' };
   }
 }

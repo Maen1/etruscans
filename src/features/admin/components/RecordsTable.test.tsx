@@ -1,6 +1,10 @@
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import RecordsTable from './RecordsTable';
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: vi.fn(), refresh: vi.fn() })
+}));
 import { InscriptionData } from '../../inscriptions/schema';
 
 describe('RecordsTable', () => {

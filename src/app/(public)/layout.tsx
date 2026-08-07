@@ -28,6 +28,12 @@ export default function PublicLayout({
               <Link href="/admin" className="text-slate-600 hover:text-slate-900 transition-colors">
                 PI Dashboard
               </Link>
+              <Link href="/unidentified" className="text-slate-600 hover:text-slate-900 transition-colors">
+                Unidentified
+              </Link>
+              <Link href="/about" className="text-slate-600 hover:text-slate-900 transition-colors">
+                About
+              </Link>
             </div>
           </div>
           
