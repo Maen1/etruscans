@@ -45,3 +45,7 @@ AGENTS.md
 *.pdf
 *.numbers
 *.csv
+
+# Local documentation & infrastructure scripts
+docs/
+
