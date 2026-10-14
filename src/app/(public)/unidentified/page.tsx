@@ -5,6 +5,8 @@ export const metadata = {
   description: 'A list of inscriptions in the archive that have not yet been securely identified.',
 };
 
+export const dynamic = 'force-dynamic';
+
 export default function UnidentifiedPage() {
   return <UnidentifiedList />;
 }

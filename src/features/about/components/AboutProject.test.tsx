@@ -3,9 +3,11 @@ import { describe, it, expect } from 'vitest';
 import { AboutProject } from './AboutProject';
 
 describe('AboutProject', () => {
-  it('renders about information', () => {
+  it('renders about information and contributor gallery', () => {
     render(<AboutProject />);
-    expect(screen.getByText('About the Project')).toBeInTheDocument();
-    expect(screen.getByText(/What this database is/)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: /About the Project & the Archive/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: 'The Archive' })).toBeInTheDocument();
+    expect(screen.getAllByText(/Olof August Danielsson/i).length).toBeGreaterThan(0);
+    expect(screen.getByText(/What this database is/i)).toBeInTheDocument();
   });
 });

@@ -29,9 +29,9 @@ describe('Inscription Views', () => {
       // Forgery flag should be visible
       expect(screen.getByText(/Possible Forgery/i)).toBeInTheDocument();
 
-      // Corpora
-      expect(screen.getByText('CIE 05039')).toBeInTheDocument();
-      expect(screen.getByText('ET2 Vs 1.0138')).toBeInTheDocument();
+      // Corpora (zero-stripped)
+      expect(screen.getByText('CIE 5039')).toBeInTheDocument();
+      expect(screen.getByText('ET2 Vs 1.138')).toBeInTheDocument();
 
       // References (Alvin Links)
       const link = screen.getByRole('link', { name: 'UUB 4134' });

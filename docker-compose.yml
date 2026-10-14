@@ -1,0 +1,59 @@
+name: etruscans
+
+services:
+  mongo:
+    image: mongo:7.0
+    restart: unless-stopped
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - etruscans-network
+    ports:
+      - "127.0.0.1:27017:27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017/etruscans
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-e7rUsC4n5_Pr0d_S3cr3t_K3y_2026!}
+      - NEXTAUTH_URL=${NEXTAUTH_URL:-http://130.238.147.110}
+      - ADMIN_USERNAME=${ADMIN_USERNAME:-admin}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin123}
+      - NODE_ENV=production
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - etruscans-network
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+    networks:
+      - etruscans-network
+
+volumes:
+  mongo_data:
+  caddy_data:
+  caddy_config:
+
+networks:
+  etruscans-network:
+    driver: bridge

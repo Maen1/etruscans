@@ -1,0 +1,46 @@
+name: Deploy Etruscans to Nutanix VM
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: production-deployment
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build & Deploy Application
+    runs-on: self-hosted
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Build and deploy containers
+        run: |
+          echo "Starting Docker Compose deployment..."
+          docker compose up -d --build --remove-orphans
+          echo "Deployment command completed."
+
+      - name: Cleanup unused images
+        run: |
+          docker image prune -f
+
+      - name: Verify application health
+        run: |
+          echo "Verifying application is responding..."
+          for i in {1..30}; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:80/ || true)
+            if [ "$STATUS" = "200" ]; then
+              echo "Healthcheck passed: HTTP $STATUS"
+              exit 0
+            fi
+            echo "Attempt $i: Status $STATUS, waiting 2s..."
+            sleep 2
+          done
+          echo "Healthcheck failed! App did not return HTTP 200 within 60s"
+          docker compose logs --tail=50 app
+          exit 1

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import { InscriptionSchema, type InscriptionData } from '../../inscriptions/schema';
+import { InscriptionSchema, type InscriptionData } from '../../inscriptions/validations';
 import { createInscription, updateInscription } from '../actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

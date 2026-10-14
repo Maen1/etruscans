@@ -3,6 +3,8 @@ import { Archive, ExternalLink } from 'lucide-react';
 import { InscriptionData } from '../schema';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 
+import { stripLeadingZeros } from '../utils';
+
 export default function InscriptionDetail({ record }: { record: InscriptionData }) {
   const groupedRefs = record.references.reduce((acc: Record<string, any[]>, ref) => {
     if (!acc[ref.category]) acc[ref.category] = [];
@@ -27,7 +29,7 @@ export default function InscriptionDetail({ record }: { record: InscriptionData 
                 <span key={i}>
                   <span className="mx-2 text-muted-foreground/50">=</span>
                   <Link href={`/browse/${corpus.name}`} className="text-primary hover:underline transition-colors">
-                    {corpus.identifier}
+                    {stripLeadingZeros(corpus.identifier)}
                   </Link>
                 </span>
               ))}
@@ -72,7 +74,7 @@ export default function InscriptionDetail({ record }: { record: InscriptionData 
                             rel="noopener noreferrer"
                             className="inline-flex items-center px-2.5 py-1.5 rounded-md text-sm font-medium bg-background border border-border hover:bg-muted hover:border-muted-foreground/30 transition-colors shadow-sm text-primary group"
                           >
-                            {ref.label}
+                            {stripLeadingZeros(ref.label)}
                             <ExternalLink className="ml-1.5 w-3 h-3 opacity-50 group-hover:opacity-100 transition-opacity" />
                           </a>
                         </li>

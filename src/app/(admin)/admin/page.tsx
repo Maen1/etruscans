@@ -5,6 +5,8 @@ import dbConnect from '@/lib/db';
 import { Inscription } from '@/features/inscriptions/schema';
 import RecordsTable from '@/features/admin/components/RecordsTable';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminDashboardPage() {
   await dbConnect();
   
